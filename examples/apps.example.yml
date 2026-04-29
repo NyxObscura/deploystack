@@ -1,0 +1,53 @@
+# Multi-app configuration for deploystack.
+#
+# Every app below receives:
+#   - its own deploy queue (no concurrent deploys for the same app)
+#   - its own PM2 process (managed via `pm2 reload <name>`)
+#   - its own HMAC webhook secret
+#   - its own release directory under $DEPLOYSTACK_ROOT/<name>/releases/
+#
+# Webhook URL for each app is:
+#   https://<your-host>/webhook/<name>
+
+apps:
+  my-app:
+    # GitHub repo in owner/name form, or full clone URL (HTTPS or git@...)
+    repo: "https://github.com/your-org/my-next-app.git"
+
+    # Only deploys when the pushed ref matches this branch.
+    branch: "main"
+
+    # Per-app HMAC secret. MUST match the "Secret" field in GitHub webhook settings.
+    # Generate with: openssl rand -hex 32
+    secret_env: "MY_APP_WEBHOOK_SECRET"
+
+    # PM2 process name for this app (see ecosystem.config.example.js)
+    pm2_name: "my-app"
+
+    # Package manager to use inside the release directory. One of: npm | pnpm | yarn
+    package_manager: "npm"
+
+    # Build command. Runs inside the release directory. Empty string disables build.
+    build_command: "npm run build"
+
+    # Install command. Runs inside the release directory. Use `ci` for reproducible installs.
+    install_command: "npm ci --no-audit --no-fund"
+
+    # Node version to pin via .nvmrc / volta / fnm if present. Optional.
+    node_version: ""
+
+    # Files from <app>/shared/ that are symlinked into each new release before build.
+    # Typical: .env.production, uploads/, .next/cache (if you want shared build cache)
+    shared_files:
+      - ".env.production"
+
+    shared_dirs:
+      - "uploads"
+
+    # Health-check URL hit after pm2 reload. Symlink only swaps if this returns 2xx
+    # within `healthcheck_timeout` seconds. Leave blank to skip.
+    healthcheck_url: "http://127.0.0.1:3000/api/health"
+    healthcheck_timeout: 20
+
+    # Keep the N most recent successful release directories. Older ones are pruned.
+    keep_releases: 5

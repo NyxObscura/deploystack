@@ -1,0 +1,16 @@
+node_modules/
+npm-debug.log*
+.DS_Store
+.env
+.env.local
+*.log
+coverage/
+.nyc_output/
+
+# runtime state (never commit)
+apps.yml
+data/
+logs/
+releases/
+current
+*.lock
