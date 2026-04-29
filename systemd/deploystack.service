@@ -1,0 +1,37 @@
+[Unit]
+Description=deploystack webhook server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Dedicated unprivileged user. See docs/SETUP.md.
+User=deploy
+Group=deploy
+
+# EnvironmentFile must contain DEPLOYSTACK_* vars and all per-app secret_env values.
+EnvironmentFile=/etc/deploystack/env
+
+WorkingDirectory=/opt/deploystack
+ExecStart=/usr/bin/node /opt/deploystack/src/server.js
+
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+
+# Hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/srv/apps /var/lib/deploystack /var/log/deploystack /home/deploy/.pm2
+ProtectHome=read-only
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=yes
+MemoryDenyWriteExecute=no
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

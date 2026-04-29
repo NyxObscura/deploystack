@@ -1,0 +1,27 @@
+{
+  "name": "deploystack",
+  "version": "1.0.0",
+  "description": "Self-hosted zero-downtime deployment system for Next.js apps, triggered by GitHub webhooks.",
+  "license": "MIT",
+  "main": "src/server.js",
+  "bin": {
+    "deploystack": "bin/deploystack"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "cli": "node bin/deploystack",
+    "lint": "node --check src/server.js && node --check src/config.js && node --check src/queue.js && node --check src/deployer.js && node --check src/webhook.js && node --check src/releases.js && node --check src/logger.js && node --check src/status.js && node --check src/cli.js && node --check bin/deploystack && bash -n scripts/deploy.sh && bash -n scripts/rollback.sh && bash -n scripts/lib.sh",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
+    "pino": "^9.4.0",
+    "pino-pretty": "^11.2.2"
+  },
+  "devDependencies": {}
+}
